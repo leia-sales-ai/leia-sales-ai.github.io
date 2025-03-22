@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leia - KI-Assistentin für Sales Calls</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
+    <style>
+        /* Custom styles */
+        #message-box {
+            display: none;
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #f0fdf4;
+            color: #15803d;
+            padding: 16px;
+            border-radius: 6px;
+            border: 1px solid #16a34a;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            z-index: 10;
+        }
+        #message-box.show {
+            display: block;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0f172a; /* Dunkler, futuristischer Hintergrund */
+            color: #f9fafb; /* Heller, kontrastreicher Text */
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1); /* Dezente, helle Linie */
+        }
+
+        header a {
+            text-decoration: none;
+            color: #fff;
+            font-weight: 600;
+            font-size: 1.5rem;
+        }
+
+        header nav ul {
+            display: flex;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        header nav ul li {
+            margin-left: 2rem;
+        }
+
+        header nav ul li a {
+            color: #e2e8f0;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease, transform 0.2s ease; /* Sanftere Übergänge */
+            display: inline-block; /* Für transform nutzen */
+            padding: 0.5rem 0;
+        }
+
+        header nav ul li a:hover {
+            color: #6ee7b7; /* Akzentfarbe: Türkis */
+            transform: translateY(-2px); /* Leichte Schwebung beim Hover */
+        }
+
+        .hero-section {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+
+        .hero-section h1 {
+            font-size: 3.5rem;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 1.5rem;
+            letter-spacing: -0.05em;
+        }
+
+        .hero-section p {
+            font-size: 1.25rem;
+            color: #d1d5db;
+            line-height: 1.75;
+            margin-bottom: 2rem;
+            max-width: 80%;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .hero-section a {
+            display: inline-block;
+            background-image: linear-gradient(to right, #6ee7b7, #3b82f6); /* Farbverlauf */
+            color: #0f172a;
+            padding: 1rem 2.5rem;
+            border-radius: 0.75rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08);
+        }
+
+        .hero-section a:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15), 0 2px 4px rgba(0, 0, 0, 0.12);
+        }
+
+        .section-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 3rem;
+            text-align: center;
+            letter-spacing: -0.025em;
+        }
+
+        .einleitung-text {
+            font-size: 1.25rem;
+            color: #d1d5db;
+            line-height: 1.75;
+            margin-bottom: 4rem;
+            max-width: 80%;
+            margin-left: auto;
+            margin-right: auto;
+            text-align: center;
+        }
+
+        #einleitung {
+            background-color: rgba(107, 114, 128, 0.2); /* Leichtes Overlay für Sektionen */
+            padding: 4rem 0;
+            border-radius: 0.75rem;
+            margin-bottom: 4rem;
+        }
+
+        #vision {
+             background-color: rgba(107, 114, 128, 0.2); /* Leichtes Overlay für Sektionen */
+            padding: 4rem 0;
+            border-radius: 0.75rem;
+            margin-bottom: 4rem;
+        }
+
+        #funktionen {
+            margin-bottom: 4rem;
+        }
+
+        .feature-title {
+            font-size: 1.85rem;
+            font-weight: 600;
+            color: #6ee7b7; /* Türkis */
+            margin-bottom: 1.5rem;
+        }
+
+        .feature-list {
+            list-style: none;
+            padding-left: 0;
+            margin-bottom: 2rem;
+            color: #d1d5db;
+            font-size: 1.1rem;
+            line-height: 1.75;
+        }
+
+        .feature-list li::before {
+            content: '▹';
+            color: #6ee7b7; /* Türkis */
+            margin-right: 0.75rem;
+        }
+
+        .arbeitsweise-schritte {
+            margin-bottom: 4rem;
+        }
+
+        .arbeitsweise-schritte h3 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 1rem;
+        }
+
+        .arbeitsweise-schritte p {
+            font-size: 1.1rem;
+            color: #d1d5db;
+            line-height: 1.75;
+        }
+
+        .testimonial-block {
+            background-color: rgba(107, 114, 128, 0.1);
+            border-radius: 0.75rem;
+            padding: 2.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .testimonial-block:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 8px 12px rgba(0, 0, 0, 0.15), 0 3px 6px rgba(0, 0, 0, 0.12);
+        }
+
+        .testimonial-text {
+            font-style: italic;
+            font-size: 1.25rem;
+            color: #e2e8f0;
+            line-height: 1.75;
+            margin-bottom: 1.5rem;
+        }
+
+        .testimonial-author {
+            font-weight: 600;
+            color: #6ee7b7;
+            font-size: 1.1rem;
+        }
+
+        #preise {
+            background-color: rgba(107, 114, 128, 0.1);
+            padding: 4rem 0;
+            border-radius: 0.75rem;
+            margin-bottom: 4rem;
+            text-align: center;
+        }
+
+        #preise h2 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 1.5rem;
+        }
+
+        #preise p {
+            font-size: 1.2rem;
+            color: #d1d5db;
+            line-height: 1.75;
+            margin-bottom: 1rem;
+        }
+
+        #kontakt {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+
+        #kontakt h2 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 2rem;
+        }
+
+        #kontakt a {
+            display: inline-block;
+            padding: 1rem 2.5rem;
+            border-radius: 0.75rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: transform 0.2s ease, box-shadow 0.2s ease, background-image 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08);
+            font-size: 1.2rem;
+        }
+
+        #kontakt a:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15), 0 2px 4px rgba(0, 0, 0, 0.12);
+        }
+
+        #kontakt a:nth-child(1) {
+            background-image: linear-gradient(to right, #6ee7b7, #3b82f6);
+            color: #0f172a;
+        }
+
+        #kontakt a:nth-child(1):hover {
+            background-image: linear-gradient(to right, #86efac, #2563eb);
+        }
+
+        #kontakt a:nth-child(2) {
+            background-image: linear-gradient(to right, #f472b6, #8b5cf6);
+            color: #fff;
+        }
+
+        #kontakt a:nth-child(2):hover {
+            background-image: linear-gradient(to right, #ec4899, #6d28d9);
+        }
+
+        #kontakt a:nth-child(3) {
+            background-image: linear-gradient(to right, #d1d5db, #9ca3af);
+            color: #1f2937;
+            border: none;
+        }
+
+        #kontakt a:nth-child(3):hover {
+            background-image: linear-gradient(to right, #f3f4f6, #6b7280);
+        }
+
+        #kontakt p {
+            font-size: 1.2rem;
+            color: #d1d5db;
+            line-height: 1.75;
+            margin-bottom: 1rem;
+        }
+
+        footer {
+            background-color: #0f172a;
+            padding: 3rem 0;
+            margin-top: 6rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        footer p {
+            color: #d1d5db;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        footer a {
+            color: #6ee7b7;
+            text-decoration: underline;
+        }
+
+        footer a:hover {
+            color: #86efac;
+        }
+    </style>
+</head>
+<body class="bg-gray-900 font-inter">
+    <div class="container">
+        <header>
+            <a href="#" class="logo">Leia</a>
+            <nav>
+                <ul>
+                    <li><a href="#funktionen">Funktionen</a></li>
+                    <li><a href="#vision">Vision</a></li>
+                    <li><a href="#preise">Preise</a></li>
+                    <li><a href="#kontakt">Kontakt</a></li>
+                    <li><a href="#demo" class="demo-anfragen">Demo anfragen</a></li>
+                </ul>
+            </nav>
+        </header>
+
+        <main>
+            <section id="hero" class="hero-section">
+                <h1>Steigere deinen Vertriebserfolg mit Leia – deiner KI-Assistentin für Sales Calls</h1>
+                <p>Sofortige Gesprächsanalyse und Dokumentation<br>Bessere Argumentationen und schnellere Abschlüsse<br>Automatische Content-Erstellung und Feature-Request-Insights</p>
+                <a href="#demo">Jetzt Demo sichern</a>
+                <p class="mt-6 text-gray-400 max-w-2xl mx-auto">Mit Leia verwandelt sich jedes Sales-Gespräch in wertvolle Daten, die dich und dein Team an die Spitze bringen. Keine aufwändige Nachbereitung mehr – konzentriere dich voll auf den Kunden und schließe mehr Deals ab.</p>
+            </section>
+
+            <section id="einleitung" class="einleitung-text">
+                <h2 class="section-title">Was ist Leia?</h2>
+                <p>Leia ist deine neue, KI-gestützte Gesprächsassistentin, die Sales Calls nicht nur automatisch dokumentiert, sondern auch in Echtzeit analysiert. Unser Ziel: Dir handfeste Empfehlungen für bessere Argumentation, effiziente Einwandbehandlung und schnellere Abschlüsse zu liefern. Dabei integriert sich Leia nahtlos in dein bestehendes CRM – oder wir finden die optimale Lösung für dein Team.</p>
+            </section>
+
+            <section id="vision">
+                <h2 class="section-title">Unsere Vision</h2>
+                <p class="text-gray-300 max-w-3xl mx-auto text-center">Wir glauben, dass Vertriebsteams frei sein sollten, sich ganz auf das Kundengespräch zu konzentrieren, anstatt Zeit mit manueller Dokumentation und Recherche zu verschwenden. Mit Leia erhält dein Vertrieb genau die Insights, die wirklich zählen – und das in einem Bruchteil der Zeit, die du bisher aufgewendet hast.</p>
+            </section>
+
+            <section id="funktionen">
+                <h2 class="section-title">Key Features & Vorteile</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div>
+                        <h3 class="feature-title">Automatische Dokumentation</h3>
+                        <ul class="feature-list">
+                            <li>Kein Tippen, kein Zeitverlust: Leia erfasst Gesprächsinhalte automatisch und überträgt sie direkt ins CRM.</li>
+                            <li>Strukturierte Notizen: Entscheidende Fakten, Aufgaben und Follow-ups werden übersichtlich festgehalten.</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3 class="feature-title">Sales-Call-Feedback & Performance-Boost</h3>
+                        <ul class="feature-list">
+                            <li>Echtzeit-Analyse: Redeanteile, Argumentationsstärke und Einwände werden direkt ausgewertet.</li>
+                            <li>Gezielte Optimierung: Erhalte individuelle Tipps, um Abschlüsse schneller und sicherer zu machen.</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3 class="feature-title">Feature-Request-Insights</h3>
+                        <ul class="feature-list">
+                            <li>Kundenwünsche verstehen: Leia filtert Feature Requests und Verbesserungsvorschläge aus jedem Gespräch.</li>
+                            <li>Quantitative & qualitative Daten: So priorisierst du deine Produkt-Roadmap auf Basis realer Kundenanforderungen.</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3 class="feature-title">Einwandbehandlung & FAQ-Updates</h3>
+                        <ul class="feature-list">
+                            <li>Perfekte Antworten – sofort: Häufige Einwände werden automatisch erfasst; Leia liefert Lösungsvorschläge und Textbausteine.</li>
+                            <li>Aktuelle FAQ: Wichtige Kundenfragen fließen direkt in dein Hilfecenter ein.</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3 class="feature-title">Content-Erstellung (LinkedIn & Blog)</h3>
+                        <ul class="feature-list">
+                            <li>In der Sprache deiner Kunden: Leia analysiert typische Fragen und Bedürfnisse und generiert passende Blogartikel oder Social-Media-Beiträge.</li>
+                            <li>Zeit sparen, Reichweite erhöhen: Mehr Sichtbarkeit und Relevanz ohne zusätzlichen Aufwand für dein Marketing.</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3 class="feature-title">Deal Room (Proposal)</h3>
+                        <ul class="feature-list">
+                            <li>Automatisierte Angebotsdokumente: Erstelle personalisierte Angebote oder Projektvorschläge auf Knopfdruck.</li>
+                            <li>Überzeuge deine Kunden: Teile den Deal Room direkt und transparent mit allen Beteiligten.</li>
+                        </ul>
+                    </div>
+                    <div class="col-span-full">
+                        <h3 class="feature-title">Verdopple deine Sales-Leistung</h3>
+                        <ul class="feature-list">
+                            <li>Skalierbares Wachstum: Konsequent datenbasierte Optimierungen sorgen für höhere Win-Rates und kürzere Sales-Zyklen.</li>
+                            <li>Teamförderung: Vertriebler lernen schneller aus jedem Gespräch – für dauerhafte Spitzenleistung.</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <section id="arbeitsweise">
+                <h2 class="section-title">Wie Leia funktioniert</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+                    <div class="arbeitsweise-schritte">
+                        <h3>Erstgespräch & Bedarfsermittlung</h3>
+                        <p>Wir analysieren gemeinsam deine aktuellen Prozesse, Zielvorgaben und technischen Voraussetzungen.</p>
+                    </div>
+                    <div class="arbeitsweise-schritte">
+                        <h3>Pilotphase & Sofortige Ergebnisse</h3>
+                        <p>In einer kurzen Pilotphase binden wir Leia in ausgewählte Sales Calls ein. Schon nach wenigen Gesprächen erkennst du Optimierungspotenziale und gewinnst wertvolle Insights.</p>
+                    </div>
+                    <div class="arbeitsweise-schritte">
+                        <h3>Nahtlose Integration</h3>
+                        <p>Egal ob CRM, KI-Notetaker oder Marketing-Automation: Wir integrieren Leia in dein bestehendes System oder implementieren passende Lösungen für dein Team.</p>
+                    </div>
+                    <div class="arbeitsweise-schritte">
+                        <h3>Rollout & kontinuierliche Verbesserung</h3>
+                        <p>Sobald die Ergebnisse stimmen, skalieren wir Leia auf dein gesamtes Sales-Team und optimieren kontinuierlich anhand neuer Erkenntnisse.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="testimonials">
+                <h2 class="section-title">Was unsere Kunden sagen</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <blockquote class="testimonial-block">
+                        <p class="testimonial-text">„Dank Leia müssen wir uns nicht mehr um umständliche Gesprächsprotokolle kümmern. Unser Team ist viel schneller im Follow-up und unsere Abschlussrate ist um 20 % gestiegen.“</p>
+                        <p class="testimonial-author">— Jana Müller, Head of Sales bei [Beispiel-Unternehmen]</p>
+                    </blockquote>
+                    <blockquote class="testimonial-block">
+                        <p class="testimonial-text">„Die automatisierte Analyse unserer Calls hat uns gezeigt, wo wir wirklich Verbesserungspotenzial haben. Leia ist ein echter Game-Changer!“</p>
+                        <p class="testimonial-author">— Thomas Weber, Sales Director bei [Beispiel-Kunde]</p>
+                    </blockquote>
+                </div>
+            </section>
+
+            <section id="preise">
+                <h2>Pilotangebot</h2>
+                <p class="text-lg">Nur noch zwei Pilotplätze verfügbar</p>
+                <p class="text-lg">Teste Leia in deinem Unternehmen – für begrenzte Zeit bieten wir eine exklusive Pilotphase an. Profitiere von Sonderkonditionen und setze gemeinsam mit uns neue Maßstäbe im Vertrieb.</p>
+            </section>
+
+            <section id="kontakt">
+                <h2>Bereit, deinen Vertrieb aufs nächste Level zu heben?</h2>
+                <div class="mt-8 flex justify-center flex-wrap gap-4">
+                    <a href="#demo" class="demo-anfragen">Demotermin vereinbaren</a>
+                </div>
+                <p class="mt-6">Kontaktiere uns jetzt und erfahre, wie Leia dein Team effektiv unterstützt.</p>
+                <p class="mt-4">Wir freuen uns darauf, gemeinsam mit dir den Sales-Erfolg deines Unternehmens zu revolutionieren!</p>
+            </section>
+        </main>
+
+        <footer>
+            <p class="mb-2">Kontakt: <a href="mailto:info@example.com">info@example.com</a> | +49 123 4567890 | Musterstadt, Deutschland</p>
+            <p class="mb-2">Rechtliches: <a href="#">Impressum</a> | <a href="#">Datenschutz</a> | <a href="#">AGB</a></p>
+            <p class="mb-2">Social Media: <a href="#">LinkedIn</a> | <a href="#">Twitter</a></p>
+            <p class="font-semibold">Leia – Deine KI für erfolgreiche Sales Calls.</p>
+             <div class="mt-4 text-sm text-gray-400">
+                    <p>Häufige Fragen zum Datenschutz:</p>
+                    <ul class="list-disc list-inside">
+                        <li><strong>Ist Leia DSGVO-konform?</strong> Ja, wir verarbeiten alle Daten gemäß DSGVO-Richtlinien.</li>
+                        <li><strong>Werden unsere Gesprächsdaten sicher gespeichert?</strong> Ja, alle Daten werden verschlüsselt und auf sicheren Servern in Deutschland gespeichert.</li>
+                        <li><strong>Können wir die Daten jederzeit löschen?</strong> Ja, du hast jederzeit die volle Kontrolle über deine Daten und kannst sie löschen.</li>
+                         <li><strong>Werden die Daten für Trainingszwecke verwendet?</strong> Ja, aber nur in anonymisierter Form.</li>
+                    </ul>
+                </div>
+        </footer>
+    </div>
+
+    <div id="message-box"></div>
+
+    <script>
+        // Function to show a message
+        function showMessage(message, type = 'success') {
+            const messageBox = document.getElementById('message-box');
+            messageBox.textContent = message;
+            messageBox.className = `fixed top-4 left-1/2 transform -translate-x-1/2 bg-${type === 'success' ? 'green' : 'red'}-100 text-${type === 'success' ? 'green' : 'red'}-700 border border-${type === 'success' ? 'green' : 'red'}-400 px-4 py-2 rounded shadow-md z-50`;
+            messageBox.classList.add('show');
+
+            setTimeout(() => {
+                messageBox.classList.remove('show');
+            }, 5000);
+        }
+
+        // --- Event Listeners ---
+        document.addEventListener('DOMContentLoaded', () => {
+
+            // Get all anchor elements with href starting with "#"
+            const anchorLinks = document.querySelectorAll('a[href^="#"]');
+
+            anchorLinks.forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+
+                    const targetId = this.getAttribute('href').substring(1); // Remove the "#"
+                    const targetElement = document.getElementById(targetId);
+
+                    if (targetElement) {
+                        // Calculate the offset taking into account the header height
+                        const headerHeight = document.querySelector('header').offsetHeight;
+                        const targetPosition = targetElement.offsetTop - headerHeight;
+
+                        window.scrollTo({
+                            top: targetPosition,
+                            behavior: 'smooth'
+                        });
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
